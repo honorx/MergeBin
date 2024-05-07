@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <getopt.h>
+#include <unistd.h>
 
 #define _DEBUG (0U)
 
@@ -75,7 +76,7 @@ static void print_usage (void) {
   printf ("    MergeBin 0x00000000@boot.bin 0x00002000@app.bin [firmware.bin]\r\n");
   printf ("    MergeBin +@boot.bin +@app.bin [firmware.bin]\r\n");
   printf ("\r\n");
-  printf ("binary merge tools v1.0.0 write by Dhorz <honorx@outlook.com>\r\n");
+  printf ("binary merge tools v1.0.1 write by Dhorz <honorx@outlook.com>\r\n");
   printf ("\r\n");
 }
 
@@ -315,7 +316,7 @@ int main (int argc, char **argv) {
         fputc (file_output_padbyte, file_output);
       }
     } else {
-      /* 输出警告但不截断文件 */
+      /* 输出警告且截断文件 */
       printf ("WARNING: Output file size is larger than expected !\r\n");
     }
   }
@@ -329,6 +330,12 @@ _END_OF_PROCESS:
 
   if (file_output != NULL) {
     fclose (file_output);
+  }
+
+  if (file_output_size != 0) {
+    if (truncate(file_output_path, file_output_size) == -1) {
+      printf("WARNING: Output file truncate failed !\r\n");
+    }
   }
 
   return (res);
